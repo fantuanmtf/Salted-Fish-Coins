@@ -706,7 +706,7 @@ inline const std::string get_rpc_status(const bool trusted_daemon, const std::st
       bool mainnet;
       bool testnet;
       bool stagenet;
-      bool snacknet;
+      bool zakonet;
       std::string nettype;
       std::string top_block_hash;
       uint64_t cumulative_difficulty;
@@ -746,7 +746,7 @@ inline const std::string get_rpc_status(const bool trusted_daemon, const std::st
         KV_SERIALIZE(mainnet)
         KV_SERIALIZE(testnet)
         KV_SERIALIZE(stagenet)
-        KV_SERIALIZE_OPT(snacknet, false)
+        KV_SERIALIZE_OPT(zakonet, false)
         KV_SERIALIZE(nettype)
         KV_SERIALIZE(top_block_hash)
         KV_SERIALIZE(cumulative_difficulty)

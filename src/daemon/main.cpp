@@ -243,7 +243,7 @@ int main(int argc, char const * argv[])
     try { cryptonote::core::get_network_type_from_args(vm); }
     catch (const std::runtime_error&)
     {
-      std::cerr << "Can't specify more than one of --testnet and --stagenet and --snacknet and --regtest" << ENDL;
+      std::cerr << "Can't specify more than one of --testnet and --stagenet and --zakonet and --regtest" << ENDL;
       return 1;
     }
 

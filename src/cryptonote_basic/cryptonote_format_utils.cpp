@@ -1301,7 +1301,7 @@ namespace cryptonote
   {
     std::string s = std::to_string(amount);
     insert_money_decimal_point(s, decimal_point);
-    return s;
+    return s + " " CRYPTONOTE_TICKER;
   }
   //---------------------------------------------------------------
   std::string print_money(const boost::multiprecision::uint128_t &amount, unsigned int decimal_point)
@@ -1310,7 +1310,7 @@ namespace cryptonote
     ss << amount;
     std::string s = ss.str();
     insert_money_decimal_point(s, decimal_point);
-    return s;
+    return s + " " CRYPTONOTE_TICKER;
   }
   //---------------------------------------------------------------
   uint64_t round_money_up(uint64_t amount, unsigned significant_digits)

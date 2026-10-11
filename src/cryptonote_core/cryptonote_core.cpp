@@ -81,9 +81,9 @@ namespace cryptonote
   , "Run on stagenet. The wallet must be launched with --stagenet flag."
   , false
   };
-  const command_line::arg_descriptor<bool, false> arg_snacknet_on = {
-  "snacknet"
-  , "Run on snacknet. The wallet must be launched with --snacknet flag."
+  const command_line::arg_descriptor<bool, false> arg_zakonet_on = {
+  "zakonet"
+  , "Run on zakonet. The wallet must be launched with --zakonet flag."
   , false
   };
   const command_line::arg_descriptor<bool> arg_regtest_on  = {
@@ -105,7 +105,7 @@ namespace cryptonote
     "data-dir"
   , "Specify data directory"
   , tools::get_default_data_dir()
-  , {{ &arg_testnet_on, &arg_stagenet_on, &arg_regtest_on, &arg_snacknet_on }}
+  , {{ &arg_testnet_on, &arg_stagenet_on, &arg_regtest_on, &arg_zakonet_on }}
   , [](std::array<bool, 4> nets, bool defaulted, std::string val)->std::string {
       if (nets[0])
         return (boost::filesystem::path(val) / "testnet").string();
@@ -114,7 +114,7 @@ namespace cryptonote
       else if (nets[2])
         return (boost::filesystem::path(val) / "fake").string();
       else if (nets[3])
-        return (boost::filesystem::path(val) / "snacknet").string();
+        return (boost::filesystem::path(val) / "zakonet").string();
       return val;
     }
   };
@@ -319,7 +319,7 @@ namespace cryptonote
 
     command_line::add_arg(desc, arg_testnet_on);
     command_line::add_arg(desc, arg_stagenet_on);
-    command_line::add_arg(desc, arg_snacknet_on);
+    command_line::add_arg(desc, arg_zakonet_on);
     command_line::add_arg(desc, arg_regtest_on);
     command_line::add_arg(desc, arg_keep_fakechain);
     command_line::add_arg(desc, arg_fixed_difficulty);
@@ -351,11 +351,11 @@ namespace cryptonote
   {
     const bool testnet = command_line::get_arg(vm, arg_testnet_on);
     const bool stagenet = command_line::get_arg(vm, arg_stagenet_on);
-    const bool snacknet = command_line::get_arg(vm, arg_snacknet_on);
+    const bool zakonet = command_line::get_arg(vm, arg_zakonet_on);
     const bool regtest = command_line::get_arg(vm, arg_regtest_on);
-    if (testnet + stagenet + snacknet + regtest > 1)
+    if (testnet + stagenet + zakonet + regtest > 1)
       throw std::runtime_error("More than one network type argument was specified");
-    return testnet ? TESTNET : stagenet ? STAGENET : snacknet ? SNACKNET : regtest ? FAKECHAIN : MAINNET;
+    return testnet ? TESTNET : stagenet ? STAGENET : zakonet ? ZAKONET : regtest ? FAKECHAIN : MAINNET;
   }
   //-----------------------------------------------------------------------------------------------
   bool core::handle_command_line(const boost::program_options::variables_map& vm)

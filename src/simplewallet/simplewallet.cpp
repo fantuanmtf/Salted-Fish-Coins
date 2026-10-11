@@ -2265,7 +2265,7 @@ bool simple_wallet::show_qr_code(const std::vector<std::string> &args)
   WTEXTON();
   try
   {
-    const std::string address = "monero:" + m_wallet->get_subaddress_as_str({m_current_subaddress_account, subaddress_index});
+    const std::string address = "sfc:" + m_wallet->get_subaddress_as_str({m_current_subaddress_account, subaddress_index});
     const qrcodegen::QrCode qr = qrcodegen::QrCode::encodeText(address.c_str(), qrcodegen::QrCode::Ecc::LOW);
     for (int y = -2; y < qr.getSize() + 2; y+=2)
     {
@@ -2969,7 +2969,7 @@ bool simple_wallet::help(const std::vector<std::string> &args/* = std::vector<st
     message_writer() << tr("\"balance\" - Show balance.");
     message_writer() << tr("\"address all\" - Show all addresses.");
     message_writer() << tr("\"address new\" - Create new subaddress.");
-    message_writer() << tr("\"transfer <address> <amount>\" - Send XMR to an address.");
+    message_writer() << tr("\"transfer <address> <amount>\" - Send SFC to an address.");
     message_writer() << tr("\"show_transfers [in|out|pending|failed|pool]\" - Show transactions.");
     message_writer() << tr("\"sweep_all <address>\" - Send whole balance to another wallet.");
     message_writer() << tr("\"seed\" - Show secret 25 words that can be used to recover this wallet.");
@@ -2978,7 +2978,7 @@ bool simple_wallet::help(const std::vector<std::string> &args/* = std::vector<st
     message_writer() << tr("\"version\" - Check software version.");
     message_writer() << tr("\"exit\" - Exit wallet.");
     message_writer() << "";
-    message_writer() << tr("\"donate <amount>\" - Donate XMR to the general fund.");
+    message_writer() << tr("\"donate <amount>\" - Donate SFC to the general fund.");
     message_writer() << "";
   }
   else if ((args.size() == 1) && (args.front() == "all"))
@@ -3113,7 +3113,7 @@ simple_wallet::simple_wallet()
                            tr("Show the blockchain height."));
   m_cmd_binder.set_handler("transfer", boost::bind(&simple_wallet::on_command, this, &simple_wallet::transfer, _1),
                            tr(USAGE_TRANSFER),
-                           tr("Transfer <address> <amount>. If the parameter \"index=<N1>[,<N2>,...]\" is specified, the wallet uses outputs received by addresses of those indices. If omitted, the wallet randomly chooses address indices to be used. In any case, it tries its best not to combine outputs across multiple addresses. <priority> is the priority of the transaction. The higher the priority, the higher the transaction fee. Valid values in priority order (from lowest to highest) are: unimportant, normal, elevated, priority. If omitted, the default value (see the command \"set priority\") is used. <ring_size> is the number of inputs to include for untraceability. Multiple payments can be made at once by adding URI_2 or <address_2> <amount_2> etcetera (before the payment ID, if it's included). The \"subtractfeefrom=\" list allows you to choose which destinations to fund the tx fee from instead of the change output. The fee will be split across the chosen destinations proportionally equally. For example, to make 3 transfers where the fee is taken from the first and third destinations, one could do: \"transfer <addr1> 3 <addr2> 0.5 <addr3> 1 subtractfeefrom=0,2\". Let's say the tx fee is 0.1. The balance would drop by exactly 4.5 XMR including fees, and addr1 & addr3 would receive 2.925 & 0.975 XMR, respectively. Use \"subtractfeefrom=all\" to spread the fee across all destinations."));
+                           tr("Transfer <address> <amount>. If the parameter \"index=<N1>[,<N2>,...]\" is specified, the wallet uses outputs received by addresses of those indices. If omitted, the wallet randomly chooses address indices to be used. In any case, it tries its best not to combine outputs across multiple addresses. <priority> is the priority of the transaction. The higher the priority, the higher the transaction fee. Valid values in priority order (from lowest to highest) are: unimportant, normal, elevated, priority. If omitted, the default value (see the command \"set priority\") is used. <ring_size> is the number of inputs to include for untraceability. Multiple payments can be made at once by adding URI_2 or <address_2> <amount_2> etcetera (before the payment ID, if it's included). The \"subtractfeefrom=\" list allows you to choose which destinations to fund the tx fee from instead of the change output. The fee will be split across the chosen destinations proportionally equally. For example, to make 3 transfers where the fee is taken from the first and third destinations, one could do: \"transfer <addr1> 3 <addr2> 0.5 <addr3> 1 subtractfeefrom=0,2\". Let's say the tx fee is 0.1. The balance would drop by exactly 4.5 SFC including fees, and addr1 & addr3 would receive 2.925 & 0.975 SFC, respectively. Use \"subtractfeefrom=all\" to spread the fee across all destinations."));
   m_cmd_binder.set_handler("sweep_unmixable",
                            boost::bind(&simple_wallet::on_command, this, &simple_wallet::sweep_unmixable, _1),
                            tr("Send all unmixable outputs to yourself with ring_size 1"));
@@ -3928,13 +3928,13 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm)
   const std::string wallet_dir = command_line::get_arg(vm, arg_wallet_dir);
   const bool testnet = tools::wallet2::has_testnet_option(vm);
   const bool stagenet = tools::wallet2::has_stagenet_option(vm);
-  const bool snacknet = tools::wallet2::has_snacknet_option(vm);
-  if (testnet + stagenet + snacknet > 1)
+  const bool zakonet = tools::wallet2::has_zakonet_option(vm);
+  if (testnet + stagenet + zakonet > 1)
   {
-    fail_msg_writer() << tr("Can't specify more than one of --testnet, --stagenet and --snacknet");
+    fail_msg_writer() << tr("Can't specify more than one of --testnet, --stagenet and --zakonet");
     return false;
   }
-  const network_type nettype = testnet ? TESTNET : stagenet ? STAGENET : snacknet ? SNACKNET : MAINNET;
+  const network_type nettype = testnet ? TESTNET : stagenet ? STAGENET : zakonet ? ZAKONET : MAINNET;
 
   epee::wipeable_string multisig_keys;
   epee::wipeable_string password;
@@ -4664,7 +4664,7 @@ bool simple_wallet::try_connect_to_daemon(bool silent, uint32_t* version)
         fail_msg_writer() << tr("wallet failed to connect to daemon: ") << m_wallet->get_daemon_address() << ". " <<
           boost::format(tr("Daemon either is not started or the wrong port, wrong daemon login credentials or wrong proxy was passed. "
           "Please make sure a %sdaemon is running or change the daemon settings using the 'set_daemon' command."))
-            % (m_wallet->nettype() == TESTNET ? "testnet " : m_wallet->nettype() == STAGENET ? "stagenet " : m_wallet->nettype() == SNACKNET ? "snacknet " : "");
+            % (m_wallet->nettype() == TESTNET ? "testnet " : m_wallet->nettype() == STAGENET ? "stagenet " : m_wallet->nettype() == ZAKONET ? "zakonet " : "");
     }
     return false;
   }
@@ -5670,7 +5670,7 @@ void simple_wallet::on_money_received(uint64_t height, const crypto::hash &txid,
     print_money(amount - burnt) << burn.str() << ", " <<
     tr("idx ") << subaddr_index;
 
-  const uint64_t warn_height = m_wallet->nettype() == TESTNET ? 1000000 : m_wallet->nettype() == STAGENET ? 50000 : m_wallet->nettype() == SNACKNET ? 1 : 1650000;
+  const uint64_t warn_height = m_wallet->nettype() == TESTNET ? 1000000 : m_wallet->nettype() == STAGENET ? 50000 : m_wallet->nettype() == ZAKONET ? 1 : 1650000;
   if (height >= warn_height && !is_change)
   {
     std::vector<tx_extra_field> tx_extra_fields;
@@ -6496,7 +6496,7 @@ void simple_wallet::check_for_inactivity_lock(bool user)
         tools::msg_writer() << tr("Network type: ") << (
           m_wallet->nettype() == cryptonote::TESTNET ? tr("Testnet") :
           m_wallet->nettype() == cryptonote::STAGENET ? tr("Stagenet") :
-          m_wallet->nettype() == cryptonote::SNACKNET ? tr("Snacknet") : tr("Mainnet")
+          m_wallet->nettype() == cryptonote::ZAKONET ? tr("Zakonet") : tr("Mainnet")
         );
       }
       try
@@ -6702,7 +6702,7 @@ bool simple_wallet::transfer_main(const std::vector<std::string> &args_, bool ca
     }
     else
     {
-      if (boost::starts_with(local_args[i], "monero:"))
+      if (boost::starts_with(local_args[i], "sfc:"))
         fail_msg_writer() << tr("Invalid last argument: ") << local_args.back() << ": " << error;
       else
         fail_msg_writer() << tr("Invalid last argument: ") << local_args.back();
@@ -9958,7 +9958,7 @@ bool simple_wallet::wallet_info(const std::vector<std::string> &args)
   message_writer() << tr("Network type: ") << (
     m_wallet->nettype() == cryptonote::TESTNET ? tr("Testnet") :
     m_wallet->nettype() == cryptonote::STAGENET ? tr("Stagenet") :
-    m_wallet->nettype() == cryptonote::SNACKNET ? tr("Snacknet") : tr("Mainnet"));
+    m_wallet->nettype() == cryptonote::ZAKONET ? tr("Zakonet") : tr("Mainnet"));
   message_writer() << tr("Daemon-Address: ") << m_wallet->get_daemon_address();
   message_writer() << tr("Daemon-Proxy: ") << m_wallet->get_proxy();
   if (ms_status.multisig_is_active)

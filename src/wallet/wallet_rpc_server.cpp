@@ -653,7 +653,7 @@ namespace tools
       res.wallet_type = "Normal";
     res.network_type = m_wallet->nettype() == cryptonote::TESTNET ? "Testnet"
                      : m_wallet->nettype() == cryptonote::STAGENET ? "Stagenet"
-                     : m_wallet->nettype() == cryptonote::SNACKNET ? "Snacknet"
+                     : m_wallet->nettype() == cryptonote::ZAKONET ? "Zakonet"
                      : "Mainnet";
     res.daemon_address = m_wallet->get_daemon_address();
     res.daemon_proxy = m_wallet->get_proxy();
@@ -4886,7 +4886,7 @@ namespace tools
       { cryptonote::MAINNET, "mainnet" },
       { cryptonote::TESTNET, "testnet" },
       { cryptonote::STAGENET, "stagenet" },
-      { cryptonote::SNACKNET, "snacknet" },
+      { cryptonote::ZAKONET, "zakonet" },
     };
     if (!req.any_net_type && !m_wallet) return not_open(er);
     for (const auto &net_type: net_types)
@@ -5149,10 +5149,10 @@ public:
     {
       const bool testnet = tools::wallet2::has_testnet_option(vm);
       const bool stagenet = tools::wallet2::has_stagenet_option(vm);
-      const bool snacknet = tools::wallet2::has_snacknet_option(vm);
-      if (testnet + stagenet + snacknet > 1)
+      const bool zakonet = tools::wallet2::has_zakonet_option(vm);
+      if (testnet + stagenet + zakonet > 1)
       {
-        MERROR(tools::wallet_rpc_server::tr("Can't specify more than one of --testnet, --stagenet and --snacknet"));
+        MERROR(tools::wallet_rpc_server::tr("Can't specify more than one of --testnet, --stagenet and --zakonet"));
         return false;
       }
 

@@ -166,6 +166,7 @@
 #define RPC_IP_FAILS_BEFORE_BLOCK                       3
 
 #define CRYPTONOTE_NAME                         "saltedfish"
+#define CRYPTONOTE_TICKER                       "SFC"
 #define CRYPTONOTE_BLOCKCHAINDATA_FILENAME      "data.mdb"
 #define CRYPTONOTE_BLOCKCHAINDATA_LOCK_FILENAME "lock.mdb"
 #define P2P_NET_DATA_FILENAME                   "p2pstate.bin"
@@ -297,7 +298,7 @@ namespace config
     uint32_t const GENESIS_NONCE = 10002;
   }
 
-  namespace snacknet
+  namespace zakonet
   {
     uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 99;
     uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 100;
@@ -308,7 +309,7 @@ namespace config
     boost::uuids::uuid const NETWORK_ID = { {
         0xfb, 0xaf, 0x4e, 0xef, 0xed, 0x16, 0x4f, 0x1c,
         0x9f, 0x5c, 0x7c, 0x98, 0x42, 0x4f, 0x90, 0xa3
-      } }; // snacknet
+      } }; // zakonet
     std::string const GENESIS_TX = "013c01ff0001ffffffffffff0302df5d56da0c7d643ddd1ce61901c7bdc5fb1738bfe39fbe69c28a3a7032729c0f2101168d0c4ca86fb55a4cf6a36d31431be1c53a3bd7411bb24e8832410289fa6f3b";
     uint32_t const GENESIS_NONCE = 10003;
   }
@@ -322,7 +323,7 @@ namespace cryptonote
     TESTNET,
     STAGENET,
     FAKECHAIN,
-    SNACKNET,
+    ZAKONET,
     UNDEFINED = 255
   };
   struct config_t
@@ -372,20 +373,20 @@ namespace cryptonote
       ::config::stagenet::GENESIS_TX,
       ::config::stagenet::GENESIS_NONCE
     };
-    static const config_t snacknet = {
-      ::config::snacknet::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
-      ::config::snacknet::CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX,
-      ::config::snacknet::CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX,
-      ::config::snacknet::P2P_DEFAULT_PORT,
-      ::config::snacknet::RPC_DEFAULT_PORT,
-      ::config::snacknet::ZMQ_RPC_DEFAULT_PORT,
-      ::config::snacknet::NETWORK_ID,
-      ::config::snacknet::GENESIS_TX,
-      ::config::snacknet::GENESIS_NONCE
+    static const config_t zakonet = {
+      ::config::zakonet::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
+      ::config::zakonet::CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX,
+      ::config::zakonet::CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX,
+      ::config::zakonet::P2P_DEFAULT_PORT,
+      ::config::zakonet::RPC_DEFAULT_PORT,
+      ::config::zakonet::ZMQ_RPC_DEFAULT_PORT,
+      ::config::zakonet::NETWORK_ID,
+      ::config::zakonet::GENESIS_TX,
+      ::config::zakonet::GENESIS_NONCE
     };
     switch (nettype)
     {
-      case SNACKNET: return snacknet;
+      case ZAKONET: return zakonet;
       case MAINNET: return mainnet;
       case TESTNET: return testnet;
       case STAGENET: return stagenet;

@@ -42,7 +42,7 @@ namespace daemon_args
     "config-file"
   , "Specify configuration file"
   , (daemonizer::get_default_data_dir() / std::string(CRYPTONOTE_NAME ".conf")).string()
-  , {{ &cryptonote::arg_testnet_on, &cryptonote::arg_stagenet_on, &cryptonote::arg_snacknet_on }}
+  , {{ &cryptonote::arg_testnet_on, &cryptonote::arg_stagenet_on, &cryptonote::arg_zakonet_on }}
   , [](std::array<bool, 3> testnet_stagenet, bool defaulted, std::string val)->std::string {
       if (testnet_stagenet[0] && defaulted)
         return (daemonizer::get_default_data_dir() / "testnet" /
@@ -51,7 +51,7 @@ namespace daemon_args
         return (daemonizer::get_default_data_dir() / "stagenet" /
                 std::string(CRYPTONOTE_NAME ".conf")).string();
       else if (testnet_stagenet[2] && defaulted)
-        return (daemonizer::get_default_data_dir() / "snacknet" /
+        return (daemonizer::get_default_data_dir() / "zakonet" /
                 std::string(CRYPTONOTE_NAME ".conf")).string();
       return val;
     }
@@ -60,7 +60,7 @@ namespace daemon_args
     "log-file"
   , "Specify log file"
   , (daemonizer::get_default_data_dir() / std::string(CRYPTONOTE_NAME ".log")).string()
-  , {{ &cryptonote::arg_testnet_on, &cryptonote::arg_stagenet_on, &cryptonote::arg_snacknet_on }}
+  , {{ &cryptonote::arg_testnet_on, &cryptonote::arg_stagenet_on, &cryptonote::arg_zakonet_on }}
   , [](std::array<bool, 3> testnet_stagenet, bool defaulted, std::string val)->std::string {
       if (testnet_stagenet[0] && defaulted)
         return (daemonizer::get_default_data_dir() / "testnet" /
@@ -69,7 +69,7 @@ namespace daemon_args
         return (daemonizer::get_default_data_dir() / "stagenet" /
                 std::string(CRYPTONOTE_NAME ".log")).string();
       else if (testnet_stagenet[2] && defaulted)
-        return (daemonizer::get_default_data_dir() / "snacknet" /
+        return (daemonizer::get_default_data_dir() / "zakonet" /
                 std::string(CRYPTONOTE_NAME ".log")).string();
       return val;
     }
@@ -125,14 +125,14 @@ namespace daemon_args
     "zmq-rpc-bind-port"
   , "Port for ZMQ RPC server to listen on"
   , std::to_string(config::ZMQ_RPC_DEFAULT_PORT)
-  , {{ &cryptonote::arg_testnet_on, &cryptonote::arg_stagenet_on, &cryptonote::arg_snacknet_on }}
+  , {{ &cryptonote::arg_testnet_on, &cryptonote::arg_stagenet_on, &cryptonote::arg_zakonet_on }}
   , [](std::array<bool, 3> testnet_stagenet, bool defaulted, std::string val)->std::string {
       if (testnet_stagenet[0] && defaulted)
         return std::to_string(config::testnet::ZMQ_RPC_DEFAULT_PORT);
       if (testnet_stagenet[1] && defaulted)
         return std::to_string(config::stagenet::ZMQ_RPC_DEFAULT_PORT);
       if (testnet_stagenet[2] && defaulted)
-        return std::to_string(config::snacknet::ZMQ_RPC_DEFAULT_PORT);
+        return std::to_string(config::zakonet::ZMQ_RPC_DEFAULT_PORT);
       return val;
     }
   };

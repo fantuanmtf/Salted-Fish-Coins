@@ -379,7 +379,7 @@ bool t_command_parser_executor::start_mining(const std::vector<std::string>& arg
   cryptonote::network_type nettype = cryptonote::MAINNET;
   auto parse_address_for_any_nettype = [&info, &nettype](const std::string &str) -> bool {
     static const cryptonote::network_type nettypes[] = {
-      cryptonote::MAINNET, cryptonote::TESTNET, cryptonote::STAGENET, cryptonote::SNACKNET
+      cryptonote::MAINNET, cryptonote::TESTNET, cryptonote::STAGENET, cryptonote::ZAKONET
     };
     for (cryptonote::network_type nt : nettypes)
     {

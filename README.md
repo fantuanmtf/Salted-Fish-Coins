@@ -3,7 +3,7 @@
 Salted Fish Coins is a cryptocurrency project based on the Monero codebase.
 
 这是一个基于 [Monero](https://github.com/monero-project/monero) 源码的加密货币项目，
-目前运行在自己的开发网络 **snacknet** 上（名称是临时的，后续会改）。
+目前运行在自己的开发网络 **zakonet** 上（名称是临时的，后续会改）。
 
 ## Fork declaration / Fork 声明
 
@@ -23,15 +23,15 @@ the BSD 3-Clause license.
 
 ### What is changed relative to upstream Monero
 
-- New network type `SNACKNET` (own address prefixes `99/100/101`, own P2P/RPC
+- New network type `ZAKONET` (own address prefixes `99/100/101`, own P2P/RPC
   ports `48080/48081/48082`, own network ID, own genesis block, data directory
-  `~/.saltedfish/snacknet`)
-- Own hard fork schedule (`snacknet_hard_forks`: v1 at the genesis block, v16
+  `~/.saltedfish/zakonet`)
+- Own hard fork schedule (`zakonet_hard_forks`: v1 at the genesis block, v16
   from block 2, so the chain starts on the current protocol version instead of
   replaying years of historical forks)
-- No hardcoded checkpoints on snacknet (upstream mainnet/testnet/stagenet
+- No hardcoded checkpoints on zakonet (upstream mainnet/testnet/stagenet
   checkpoints are not applied, neither on the daemon nor in the wallet)
-- No seed nodes and no DNS checkpoints on snacknet: nodes only connect to peers
+- No seed nodes and no DNS checkpoints on zakonet: nodes only connect to peers
   you add explicitly with `--add-peer`
 - Rebranded binaries (`saltedfishd`, `saltedfish-wallet-cli`, …) and data
   directory (`~/.saltedfish`)
@@ -47,21 +47,21 @@ cmake --build build -j$(nproc) --target daemon simplewallet wallet_rpc_server
 
 The binaries end up in `build/bin/`.
 
-## Running snacknet
+## Running zakonet
 
 Create a wallet and note the address it prints:
 
 ```sh
-./build/bin/saltedfish-wallet-cli --snacknet --generate-new-wallet ~/my-sfc-wallet \
+./build/bin/saltedfish-wallet-cli --zakonet --generate-new-wallet ~/my-sfc-wallet \
     --password "your password" --offline
 ```
 
 Start a node and mine to that address:
 
 ```sh
-./build/bin/saltedfishd --snacknet --offline --fixed-difficulty 1 \
-    --start-mining <your snacknet address> --mining-threads 1 \
-    --data-dir ~/.saltedfish/snacknet
+./build/bin/saltedfishd --zakonet --offline --fixed-difficulty 1 \
+    --start-mining <your zakonet address> --mining-threads 1 \
+    --data-dir ~/.saltedfish/zakonet
 ```
 
 Check the chain height:
@@ -74,7 +74,7 @@ curl -s http://127.0.0.1:48081/json_rpc -d \
 Then open the wallet, let it scan and check the balance:
 
 ```sh
-./build/bin/saltedfish-wallet-cli --snacknet --wallet-file ~/my-sfc-wallet \
+./build/bin/saltedfish-wallet-cli --zakonet --wallet-file ~/my-sfc-wallet \
     --daemon-address 127.0.0.1:48081 --trusted-daemon
 [wallet]: refresh
 [wallet]: balance
@@ -90,8 +90,40 @@ Notes:
   enabled (`MONERO_RANDOMX_FULL_MEM=1`). Without it, mining falls back to the
   slow light mode, which still works.
 
+## 引导节点（bootstrap seed）
+
+zakonet 目前没有 DNS 种子，新节点靠下面这个**临时引导节点**入网。它只通过 Tor
+提供 P2P，服务器 IP 不会暴露：
+
+```
+imbl4uqckegdurnznxn2o74yq4pxw7ftylatymqcbtgfo5qihvd7ojyd.onion:48080
+```
+
+连接方式（本机需要跑 Tor，SOCKS 端口默认 9050）：
+
+```sh
+./build/bin/saltedfishd --zakonet \
+    --add-peer imbl4uqckegdurnznxn2o74yq4pxw7ftylatymqcbtgfo5qihvd7ojyd.onion:48080 \
+    --tx-proxy tor,127.0.0.1:9050,10
+```
+
+也可以把这个地址写进 `~/.saltedfish/zakonet/saltedfish.conf`：
+
+```
+add-peer=imbl4uqckegdurnznxn2o74yq4pxw7ftylatymqcbtgfo5qihvd7ojyd.onion:48080
+tx-proxy=tor,127.0.0.1:9050,10
+```
+
+## 支持这个项目 / Buy Me a Coffee
+
+如果这个项目对你有用，欢迎请作者喝杯咖啡：
+
+- Monero (XMR)：
+  `4B6wjJUUVwyARsbMd174PN6ttc4LkBC2qarKDA881R1F3pEUMxcWx8Ta1FzAGvcoGPhE`
+
+（zakonet 的 SFC 还在开发中、没有价值，暂不收 SFC 打赏。）
+
 ## Status
 
-Early development. snacknet is a private/development network: there are no
-public seed nodes yet, and the genesis block currently uses a placeholder
-coinbase transaction (the genesis allocation is not spendable by the project).
+Early development. zakonet 是开发网络：目前只有一个临时引导节点（见上），
+创世块用的还是占位的 coinbase 交易（创世分配不可花费），主网/公开网络尚未启动。

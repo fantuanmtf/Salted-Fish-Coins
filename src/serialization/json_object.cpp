@@ -1450,7 +1450,7 @@ void toJsonValue(rapidjson::Writer<epee::byte_stream>& dest, const cryptonote::r
   INSERT_INTO_JSON_OBJECT(dest, mainnet, info.mainnet);
   INSERT_INTO_JSON_OBJECT(dest, testnet, info.testnet);
   INSERT_INTO_JSON_OBJECT(dest, stagenet, info.stagenet);
-  INSERT_INTO_JSON_OBJECT(dest, snacknet, info.snacknet);
+  INSERT_INTO_JSON_OBJECT(dest, zakonet, info.zakonet);
   INSERT_INTO_JSON_OBJECT(dest, nettype, info.nettype);
   INSERT_INTO_JSON_OBJECT(dest, top_block_hash, info.top_block_hash);
   INSERT_INTO_JSON_OBJECT(dest, cumulative_difficulty, info.cumulative_difficulty);
@@ -1492,8 +1492,8 @@ void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::DaemonInfo& inf
   GET_FROM_JSON_OBJECT(val, info.mainnet, mainnet);
   GET_FROM_JSON_OBJECT(val, info.testnet, testnet);
   GET_FROM_JSON_OBJECT(val, info.stagenet, stagenet);
-  if (val.HasMember("snacknet"))
-    cryptonote::json::fromJsonValue(val["snacknet"], info.snacknet);
+  if (val.HasMember("zakonet"))
+    cryptonote::json::fromJsonValue(val["zakonet"], info.zakonet);
   GET_FROM_JSON_OBJECT(val, info.nettype, nettype);
   GET_FROM_JSON_OBJECT(val, info.top_block_hash, top_block_hash);
   GET_FROM_JSON_OBJECT(val, info.cumulative_difficulty, cumulative_difficulty);

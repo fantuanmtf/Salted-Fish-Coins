@@ -110,14 +110,14 @@ namespace nodetool
         "p2p-bind-port"
       , "Port for p2p network protocol (IPv4)"
       , std::to_string(config::P2P_DEFAULT_PORT)
-      , {{ &cryptonote::arg_testnet_on, &cryptonote::arg_stagenet_on, &cryptonote::arg_snacknet_on }}
+      , {{ &cryptonote::arg_testnet_on, &cryptonote::arg_stagenet_on, &cryptonote::arg_zakonet_on }}
       , [](std::array<bool, 3> testnet_stagenet, bool defaulted, std::string val)->std::string {
           if (testnet_stagenet[0] && defaulted)
             return std::to_string(config::testnet::P2P_DEFAULT_PORT);
           else if (testnet_stagenet[1] && defaulted)
             return std::to_string(config::stagenet::P2P_DEFAULT_PORT);
           else if (testnet_stagenet[2] && defaulted)
-            return std::to_string(config::snacknet::P2P_DEFAULT_PORT);
+            return std::to_string(config::zakonet::P2P_DEFAULT_PORT);
           return val;
         }
       };
@@ -125,14 +125,14 @@ namespace nodetool
         "p2p-bind-port-ipv6"
       , "Port for p2p network protocol (IPv6)"
       , std::to_string(config::P2P_DEFAULT_PORT)
-      , {{ &cryptonote::arg_testnet_on, &cryptonote::arg_stagenet_on, &cryptonote::arg_snacknet_on }}
+      , {{ &cryptonote::arg_testnet_on, &cryptonote::arg_stagenet_on, &cryptonote::arg_zakonet_on }}
       , [](std::array<bool, 3> testnet_stagenet, bool defaulted, std::string val)->std::string {
           if (testnet_stagenet[0] && defaulted)
             return std::to_string(config::testnet::P2P_DEFAULT_PORT);
           else if (testnet_stagenet[1] && defaulted)
             return std::to_string(config::stagenet::P2P_DEFAULT_PORT);
           else if (testnet_stagenet[2] && defaulted)
-            return std::to_string(config::snacknet::P2P_DEFAULT_PORT);
+            return std::to_string(config::zakonet::P2P_DEFAULT_PORT);
           return val;
         }
       };

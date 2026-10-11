@@ -64,7 +64,7 @@ namespace cryptonote
 
   extern const command_line::arg_descriptor<std::string, false, true, 4> arg_data_dir;
   extern const command_line::arg_descriptor<bool, false> arg_testnet_on;
-  extern const command_line::arg_descriptor<bool, false> arg_snacknet_on;
+  extern const command_line::arg_descriptor<bool, false> arg_zakonet_on;
   extern const command_line::arg_descriptor<bool, false> arg_stagenet_on;
   extern const command_line::arg_descriptor<bool, false> arg_regtest_on;
   extern const command_line::arg_descriptor<difficulty_type> arg_fixed_difficulty;
