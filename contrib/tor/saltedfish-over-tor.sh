@@ -2,8 +2,8 @@
 
 DIR=$(realpath $(dirname $0))
 
-echo "Checking monerod..."
-monerod=""
+echo "Checking saltedfishd..."
+saltedfishd=""
 for dir in \
   . \
   "$DIR" \
@@ -15,20 +15,20 @@ for dir in \
   "$DIR/build/Windows/master/release/bin" \
   "$DIR/../../build/Windows/master/release/bin"
 do
-  if test -x "$dir/monerod"
+  if test -x "$dir/saltedfishd"
   then
-    monerod="$dir/monerod"
+    saltedfishd="$dir/saltedfishd"
     break
   fi
 done
-if test -z "$monerod"
+if test -z "$saltedfishd"
 then
-  echo "monerod not found"
+  echo "saltedfishd not found"
   exit 1
 fi
-echo "Found: $monerod"
+echo "Found: $saltedfishd"
 
-TORDIR="$DIR/monero-over-tor"
+TORDIR="$DIR/saltedfish-over-tor"
 TORRC="$TORDIR/torrc"
 HOSTNAMEFILE="$TORDIR/hostname"
 echo "Creating configuration..."
@@ -64,16 +64,16 @@ then
   exit 1
 fi
 
-echo "Starting monerod..."
+echo "Starting saltedfishd..."
 HOSTNAME=$(cat "$HOSTNAMEFILE")
-"$monerod" \
+"$saltedfishd" \
   --anonymous-inbound "$HOSTNAME":18083,127.0.0.1:18083,25 --tx-proxy tor,127.0.0.1:9050,10 \
   --detach
 ready=0
 for i in `seq 10`
 do
   sleep 1
-  status=$("$monerod" status)
+  status=$("$saltedfishd" status)
   echo "$status" | grep -q "Height:"
   if test $? = 0
   then
@@ -83,8 +83,8 @@ do
 done
 if test "$ready" = 0
 then
-  echo "Error starting monerod"
-  tail -n 400 "$HOME/.bitmonero/bitmonero.log" | grep -Ev stacktrace\|"Error: Couldn't connect to daemon:"\|"src/daemon/main.cpp:.*Monero\ \'" | tail -n 20
+  echo "Error starting saltedfishd"
+  tail -n 400 "$HOME/.saltedfish/saltedfish.log" | grep -Ev stacktrace\|"Error: Couldn't connect to daemon:"\|"src/daemon/main.cpp:.*Monero\ \'" | tail -n 20
   exit 1
 fi
 

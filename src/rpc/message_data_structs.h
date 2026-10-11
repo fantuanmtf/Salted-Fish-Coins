@@ -190,6 +190,7 @@ namespace rpc
     bool mainnet;
     bool testnet;
     bool stagenet;
+    bool snacknet;
     std::string nettype;
     crypto::hash top_block_hash;
     cryptonote::difficulty_type wide_cumulative_difficulty;

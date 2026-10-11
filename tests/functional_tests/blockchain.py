@@ -68,7 +68,7 @@ class BlockchainTest():
         daemon = Daemon()
         address = '42ey1afDFnn4886T7196doS9GPMzexD9gXpsZJDwVjeRVdFCSoHnv7KPbBeGpzJBzHRCAs9UxqeoyFQMYbqSWYTfJJQAWDm'
         build_dir = os.path.dirname(os.path.dirname(os.environ['FUNCTIONAL_TESTS_DIRECTORY']))
-        monerod = os.path.join(build_dir, 'bin', 'monerod')
+        monerod = os.path.join(build_dir, 'bin', 'saltedfishd')
 
         def run_command(*args):
             return subprocess.run([monerod, '--rpc-bind-port', '18180', '--rpc-ssl', 'disabled', 'generate_blocks', address, *args],

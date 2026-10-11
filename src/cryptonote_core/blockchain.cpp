@@ -303,7 +303,7 @@ bool Blockchain::init(BlockchainDB* db, const network_type nettype, bool offline
   m_fixed_difficulty = fixed_difficulty;
   if (m_hardfork == nullptr)
   {
-    if (m_nettype ==  FAKECHAIN || m_nettype == STAGENET)
+    if (m_nettype ==  FAKECHAIN || m_nettype == STAGENET || m_nettype == SNACKNET)
       m_hardfork = new HardFork(*db, 1, 0);
     else if (m_nettype == TESTNET)
       m_hardfork = new HardFork(*db, 1, testnet_hard_fork_version_1_till);
@@ -324,6 +324,11 @@ bool Blockchain::init(BlockchainDB* db, const network_type nettype, bool offline
   {
     for (size_t n = 0; n < num_stagenet_hard_forks; ++n)
       m_hardfork->add_fork(stagenet_hard_forks[n].version, stagenet_hard_forks[n].height, stagenet_hard_forks[n].threshold, stagenet_hard_forks[n].time);
+  }
+  else if (m_nettype == SNACKNET)
+  {
+    for (size_t n = 0; n < num_snacknet_hard_forks; ++n)
+      m_hardfork->add_fork(snacknet_hard_forks[n].version, snacknet_hard_forks[n].height, snacknet_hard_forks[n].threshold, snacknet_hard_forks[n].time);
   }
   else
   {

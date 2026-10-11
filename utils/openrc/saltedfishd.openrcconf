@@ -1,0 +1,7 @@
+SALTEDFISHD_USER="saltedfish"
+SALTEDFISHD_GROUP="saltedfish"
+
+SALTEDFISHD_DATA_DIR="/var/lib/saltedfish"
+SALTEDFISHD_CONFIG="/etc/saltedfishd.conf"
+
+SALTEDFISHD_OPTS="--data-dir ${SALTEDFISHD_DATA_DIR}"

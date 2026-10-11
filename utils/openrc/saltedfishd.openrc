@@ -1,0 +1,35 @@
+#!/sbin/openrc-run
+
+name="Monero Daemon"
+description="Monero cryptocurrency node"
+
+command="/usr/bin/saltedfishd"
+
+command_args="--non-interactive ${SALTEDFISHD_OPTS}"
+if [ -n "${SALTEDFISHD_CONFIG}" ] && [ -f "${SALTEDFISHD_CONFIG}" ]; then
+    command_args="${command_args} --config-file ${SALTEDFISHD_CONFIG}"
+fi
+
+command_user="${SALTEDFISHD_USER}:${SALTEDFISHD_GROUP}"
+
+supervisor="supervise-daemon"
+
+respawn_delay=10
+respawn_max=0
+
+depend() {
+    need net
+    use dns
+}
+
+start_pre() {
+    checkpath \
+        --directory \
+        --owner "${SALTEDFISHD_USER}:${SALTEDFISHD_GROUP}" \
+        --mode 0750 \
+        "${SALTEDFISHD_DATA_DIR}"
+
+    if [ -n "${SALTEDFISHD_CONFIG}" ] && [ ! -f "${SALTEDFISHD_CONFIG}" ]; then
+        ewarn "Config file not found: ${SALTEDFISHD_CONFIG}"
+    fi
+}

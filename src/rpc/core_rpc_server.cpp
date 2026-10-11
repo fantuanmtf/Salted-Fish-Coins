@@ -321,6 +321,7 @@ namespace cryptonote
     res.mainnet = net_type == MAINNET;
     res.testnet = net_type == TESTNET;
     res.stagenet = net_type == STAGENET;
+    res.snacknet = net_type == SNACKNET;
     res.nettype = get_network_type_name(net_type);
     store_difficulty(m_core.get_blockchain_storage().get_db().get_block_cumulative_difficulty(res.height - 1),
         res.cumulative_difficulty, res.wide_cumulative_difficulty, res.cumulative_difficulty_top64);
@@ -3103,16 +3104,18 @@ namespace cryptonote
 #endif
   }
   //------------------------------------------------------------------------------------------------------------------------------
-  const command_line::arg_descriptor<std::string, false, true, 2> core_rpc_server::arg_rpc_bind_port = {
+  const command_line::arg_descriptor<std::string, false, true, 3> core_rpc_server::arg_rpc_bind_port = {
       "rpc-bind-port"
     , "Port for RPC server"
     , std::to_string(config::RPC_DEFAULT_PORT)
-    , {{ &cryptonote::arg_testnet_on, &cryptonote::arg_stagenet_on }}
-    , [](std::array<bool, 2> testnet_stagenet, bool defaulted, std::string val)->std::string {
+    , {{ &cryptonote::arg_testnet_on, &cryptonote::arg_stagenet_on, &cryptonote::arg_snacknet_on }}
+    , [](std::array<bool, 3> testnet_stagenet, bool defaulted, std::string val)->std::string {
         if (testnet_stagenet[0] && defaulted)
           return std::to_string(config::testnet::RPC_DEFAULT_PORT);
         else if (testnet_stagenet[1] && defaulted)
           return std::to_string(config::stagenet::RPC_DEFAULT_PORT);
+        else if (testnet_stagenet[2] && defaulted)
+          return std::to_string(config::snacknet::RPC_DEFAULT_PORT);
         return val;
       }
     };

@@ -98,7 +98,7 @@ if(NOT IOS)
       ${EXTRA_LIBRARIES})
   set_property(TARGET wallet_rpc_server
     PROPERTY
-      OUTPUT_NAME "monero-wallet-rpc")
+      OUTPUT_NAME "saltedfish-wallet-rpc")
   install(TARGETS wallet_rpc_server DESTINATION bin)
 endif()
 

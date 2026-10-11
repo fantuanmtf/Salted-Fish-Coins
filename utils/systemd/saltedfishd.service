@@ -5,13 +5,13 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/monerod --config-file /etc/monero/monerod.conf --non-interactive
+ExecStart=/usr/local/bin/saltedfishd --config-file /etc/monero/saltedfishd.conf --non-interactive
 
 Restart=always
 RestartSec=30
 
-User=monero
-Group=monero
+User=saltedfish
+Group=saltedfish
 
 StandardOutput=journal
 StandardError=journal

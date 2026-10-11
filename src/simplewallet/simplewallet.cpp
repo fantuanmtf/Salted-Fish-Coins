@@ -2184,7 +2184,7 @@ bool simple_wallet::welcome(const std::vector<std::string> &args)
 
 bool simple_wallet::version(const std::vector<std::string> &args)
 {
-  message_writer() << "Monero '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")";
+  message_writer() << "Salted Fish Coins '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")";
   return true;
 }
 
@@ -2973,7 +2973,7 @@ bool simple_wallet::help(const std::vector<std::string> &args/* = std::vector<st
     message_writer() << tr("\"show_transfers [in|out|pending|failed|pool]\" - Show transactions.");
     message_writer() << tr("\"sweep_all <address>\" - Send whole balance to another wallet.");
     message_writer() << tr("\"seed\" - Show secret 25 words that can be used to recover this wallet.");
-    message_writer() << tr("\"refresh\" - Synchronize wallet with the Monero network.");
+    message_writer() << tr("\"refresh\" - Synchronize wallet with the Salted Fish Coins network.");
     message_writer() << tr("\"status\" - Check current status of wallet.");
     message_writer() << tr("\"version\" - Check software version.");
     message_writer() << tr("\"exit\" - Exit wallet.");
@@ -3928,12 +3928,13 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm)
   const std::string wallet_dir = command_line::get_arg(vm, arg_wallet_dir);
   const bool testnet = tools::wallet2::has_testnet_option(vm);
   const bool stagenet = tools::wallet2::has_stagenet_option(vm);
-  if (testnet && stagenet)
+  const bool snacknet = tools::wallet2::has_snacknet_option(vm);
+  if (testnet + stagenet + snacknet > 1)
   {
-    fail_msg_writer() << tr("Can't specify more than one of --testnet and --stagenet");
+    fail_msg_writer() << tr("Can't specify more than one of --testnet, --stagenet and --snacknet");
     return false;
   }
-  const network_type nettype = testnet ? TESTNET : stagenet ? STAGENET : MAINNET;
+  const network_type nettype = testnet ? TESTNET : stagenet ? STAGENET : snacknet ? SNACKNET : MAINNET;
 
   epee::wipeable_string multisig_keys;
   epee::wipeable_string password;
@@ -4571,7 +4572,7 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm)
     bool ssl = false;
     if (m_wallet->check_connection(NULL, &ssl) && !ssl)
       message_writer(console_color_red, true) << boost::format(tr("Using your own without SSL exposes your RPC traffic to monitoring"));
-    message_writer(console_color_red, true) << boost::format(tr("You are strongly encouraged to connect to the Monero network using your own daemon"));
+    message_writer(console_color_red, true) << boost::format(tr("You are strongly encouraged to connect to the Salted Fish Coins network using your own daemon"));
     message_writer(console_color_red, true) << boost::format(tr("If you or someone you trust are operating this daemon, you can use --trusted-daemon"));
   }
 
@@ -4663,7 +4664,7 @@ bool simple_wallet::try_connect_to_daemon(bool silent, uint32_t* version)
         fail_msg_writer() << tr("wallet failed to connect to daemon: ") << m_wallet->get_daemon_address() << ". " <<
           boost::format(tr("Daemon either is not started or the wrong port, wrong daemon login credentials or wrong proxy was passed. "
           "Please make sure a %sdaemon is running or change the daemon settings using the 'set_daemon' command."))
-            % (m_wallet->nettype() == TESTNET ? "testnet " : m_wallet->nettype() == STAGENET ? "stagenet " : "");
+            % (m_wallet->nettype() == TESTNET ? "testnet " : m_wallet->nettype() == STAGENET ? "stagenet " : m_wallet->nettype() == SNACKNET ? "snacknet " : "");
     }
     return false;
   }
@@ -4845,7 +4846,7 @@ boost::optional<epee::wipeable_string> simple_wallet::new_wallet(const boost::pr
     "Use the \"help\" command to see a simplified list of available commands.\n"
     "Use \"help all\" command to see the list of all available commands.\n"
     "Use \"help <command>\" to see a command's documentation.\n"
-    "Always use the \"exit\" command when closing monero-wallet-cli to save \n"
+    "Always use the \"exit\" command when closing saltedfish-wallet-cli to save \n"
     "your current session's state. Otherwise, you might need to synchronize \n"
     "your wallet again (your wallet keys are NOT at risk in any case).\n")
   ;
@@ -5279,7 +5280,7 @@ void simple_wallet::start_background_mining()
       return;
     }
   }
-  success_msg_writer() << tr("Background mining enabled. Thank you for supporting the Monero network.");
+  success_msg_writer() << tr("Background mining enabled. Thank you for supporting the Salted Fish Coins network.");
 }
 //----------------------------------------------------------------------------------------------------
 void simple_wallet::stop_background_mining()
@@ -5669,7 +5670,7 @@ void simple_wallet::on_money_received(uint64_t height, const crypto::hash &txid,
     print_money(amount - burnt) << burn.str() << ", " <<
     tr("idx ") << subaddr_index;
 
-  const uint64_t warn_height = m_wallet->nettype() == TESTNET ? 1000000 : m_wallet->nettype() == STAGENET ? 50000 : 1650000;
+  const uint64_t warn_height = m_wallet->nettype() == TESTNET ? 1000000 : m_wallet->nettype() == STAGENET ? 50000 : m_wallet->nettype() == SNACKNET ? 1 : 1650000;
   if (height >= warn_height && !is_change)
   {
     std::vector<tx_extra_field> tx_extra_fields;
@@ -6494,7 +6495,8 @@ void simple_wallet::check_for_inactivity_lock(bool user)
         tools::msg_writer() << tr("Filename: ") << m_wallet->get_wallet_file();
         tools::msg_writer() << tr("Network type: ") << (
           m_wallet->nettype() == cryptonote::TESTNET ? tr("Testnet") :
-          m_wallet->nettype() == cryptonote::STAGENET ? tr("Stagenet") : tr("Mainnet")
+          m_wallet->nettype() == cryptonote::STAGENET ? tr("Stagenet") :
+          m_wallet->nettype() == cryptonote::SNACKNET ? tr("Snacknet") : tr("Mainnet")
         );
       }
       try
@@ -9955,7 +9957,8 @@ bool simple_wallet::wallet_info(const std::vector<std::string> &args)
   message_writer() << tr("Type: ") << type;
   message_writer() << tr("Network type: ") << (
     m_wallet->nettype() == cryptonote::TESTNET ? tr("Testnet") :
-    m_wallet->nettype() == cryptonote::STAGENET ? tr("Stagenet") : tr("Mainnet"));
+    m_wallet->nettype() == cryptonote::STAGENET ? tr("Stagenet") :
+    m_wallet->nettype() == cryptonote::SNACKNET ? tr("Snacknet") : tr("Mainnet"));
   message_writer() << tr("Daemon-Address: ") << m_wallet->get_daemon_address();
   message_writer() << tr("Daemon-Proxy: ") << m_wallet->get_proxy();
   if (ms_status.multisig_is_active)
@@ -10573,12 +10576,12 @@ int main(int argc, char* argv[])
   bool should_terminate = false;
   std::tie(vm, should_terminate) = wallet_args::main(
    argc, argv,
-   "monero-wallet-cli [--wallet-file=<filename>|--generate-new-wallet=<filename>] [<COMMAND>]",
-    sw::tr("This is the command line monero wallet. It needs to connect to a monero\ndaemon to work correctly.\nWARNING: Do not reuse your Monero keys on another fork, UNLESS this fork has key reuse mitigations built in. Doing so will harm your privacy."),
+   "saltedfish-wallet-cli [--wallet-file=<filename>|--generate-new-wallet=<filename>] [<COMMAND>]",
+    sw::tr("This is the command line Salted Fish Coins wallet. It needs to connect to a\nSalted Fish Coins daemon to work correctly.\nWARNING: Do not reuse your Monero keys on another fork, UNLESS this fork has key reuse mitigations built in. Doing so will harm your privacy."),
     desc_params,
     positional_options,
     [](const std::string &s, bool emphasis){ tools::scoped_message_writer(emphasis ? epee::console_color_white : epee::console_color_default, true) << s; },
-    "monero-wallet-cli.log"
+    "saltedfish-wallet-cli.log"
   );
 
   if (!vm)

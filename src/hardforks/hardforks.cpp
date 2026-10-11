@@ -126,3 +126,15 @@ const hardfork_t stagenet_hard_forks[] = {
   { 16, 1151720, 0, 1656629118 },
 };
 const size_t num_stagenet_hard_forks = sizeof(stagenet_hard_forks) / sizeof(stagenet_hard_forks[0]);
+
+const hardfork_t snacknet_hard_forks[] = {
+  // version 1 from the start of the blockchain: the genesis block is always v1
+  { 1, 1, 0, 1341378000 },
+
+  // version 16 from block 2: snacknet is a brand new chain, so unlike the
+  // existing networks it does not replay the historical fork schedule. It
+  // starts directly on the current protocol version, so that every block
+  // after the genesis uses modern rules (RingCT, Bulletproofs+, CLSAG, ...)
+  { 16, 2, 0, 1341378001 },
+};
+const size_t num_snacknet_hard_forks = sizeof(snacknet_hard_forks) / sizeof(snacknet_hard_forks[0]);

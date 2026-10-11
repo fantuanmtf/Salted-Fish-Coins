@@ -561,9 +561,10 @@ namespace nodetool
   {
     bool testnet = command_line::get_arg(vm, cryptonote::arg_testnet_on);
     bool stagenet = command_line::get_arg(vm, cryptonote::arg_stagenet_on);
+    bool snacknet = command_line::get_arg(vm, cryptonote::arg_snacknet_on);
     bool regtest = command_line::get_arg(vm, cryptonote::arg_regtest_on);
     const bool pad_txs = command_line::get_arg(vm, arg_pad_transactions);
-    m_nettype = testnet ? cryptonote::TESTNET : stagenet ? cryptonote::STAGENET : regtest ? cryptonote::FAKECHAIN : cryptonote::MAINNET;
+    m_nettype = testnet ? cryptonote::TESTNET : stagenet ? cryptonote::STAGENET : snacknet ? cryptonote::SNACKNET : regtest ? cryptonote::FAKECHAIN : cryptonote::MAINNET;
 
     network_zone& public_zone = m_network_zones[epee::net_utils::zone::public_];
     public_zone.m_connect = &public_connect;
@@ -853,8 +854,10 @@ namespace nodetool
       full_addrs.insert("88.99.195.15:38080");
       full_addrs.insert("5.104.84.64:38080");
     }
-    else if (m_nettype == cryptonote::FAKECHAIN)
+    else if (m_nettype == cryptonote::FAKECHAIN || m_nettype == cryptonote::SNACKNET)
     {
+      // no seed nodes: a snacknet node must only ever talk to nodes
+      // explicitly added by the user (or none at all)
     }
     else
     {
@@ -883,7 +886,7 @@ namespace nodetool
     {
       return get_ip_seed_nodes();
     }
-    if (m_nettype == cryptonote::FAKECHAIN)
+    if (m_nettype == cryptonote::FAKECHAIN || m_nettype == cryptonote::SNACKNET)
     {
       return {};
     }
@@ -1056,6 +1059,10 @@ namespace nodetool
     {
       memcpy(&m_network_id, &::config::stagenet::NETWORK_ID, 16);
     }
+    else if (m_nettype == cryptonote::SNACKNET)
+    {
+      memcpy(&m_network_id, &::config::snacknet::NETWORK_ID, 16);
+    }
     else
     {
       memcpy(&m_network_id, &::config::NETWORK_ID, 16);
@@ -1066,7 +1073,8 @@ namespace nodetool
 
     if ((m_nettype == cryptonote::MAINNET && public_zone.m_port != std::to_string(::config::P2P_DEFAULT_PORT))
         || (m_nettype == cryptonote::TESTNET && public_zone.m_port != std::to_string(::config::testnet::P2P_DEFAULT_PORT))
-        || (m_nettype == cryptonote::STAGENET && public_zone.m_port != std::to_string(::config::stagenet::P2P_DEFAULT_PORT))) {
+        || (m_nettype == cryptonote::STAGENET && public_zone.m_port != std::to_string(::config::stagenet::P2P_DEFAULT_PORT))
+        || (m_nettype == cryptonote::SNACKNET && public_zone.m_port != std::to_string(::config::snacknet::P2P_DEFAULT_PORT))) {
       m_config_folder = m_config_folder + "/" + public_zone.m_port;
     }
 

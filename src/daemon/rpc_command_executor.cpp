@@ -501,7 +501,7 @@ bool t_rpc_command_executor::show_status() {
     % (unsigned long long)ires.height
     % (unsigned long long)net_height
     % get_sync_percentage(ires.height, ires.target_height)
-    % (ires.testnet ? "testnet" : ires.stagenet ? "stagenet" : "mainnet")
+    % (ires.nettype.empty() ? (ires.testnet ? "testnet" : ires.stagenet ? "stagenet" : "mainnet") : ires.nettype)
     % (!has_mining_info ? "mining info unavailable" : mining_busy ? "syncing" : mres.active ? ( ( mres.is_background_mining_enabled ? "smart " : "" ) + std::string("mining at ") + get_mining_speed(mres.speed)) : "not mining")
     % get_mining_speed(cryptonote::difficulty_type(ires.wide_difficulty) / ires.target)
     % (unsigned)hfres.version
@@ -1468,10 +1468,10 @@ bool t_rpc_command_executor::print_status()
   bool daemon_is_alive = m_rpc_client->check_connection();
 
   if(daemon_is_alive) {
-    tools::success_msg_writer() << "monerod is running";
+    tools::success_msg_writer() << "saltedfishd is running";
   }
   else {
-    tools::fail_msg_writer() << "monerod is NOT running";
+    tools::fail_msg_writer() << "saltedfishd is NOT running";
   }
 
   return true;

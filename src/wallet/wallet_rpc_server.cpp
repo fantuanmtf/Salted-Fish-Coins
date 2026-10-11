@@ -69,7 +69,7 @@
     if (m_wallet->get_multisig_status().multisig_is_active && !m_wallet->is_multisig_enabled()) \
     { \
       er.code = WALLET_RPC_ERROR_CODE_DISABLED; \
-      er.message = "This wallet is multisig, and multisig is disabled. Multisig is an experimental feature and may have bugs. Things that could go wrong include: funds sent to a multisig wallet can't be spent at all, can only be spent with the participation of a malicious group member, or can be stolen by a malicious group member. You can enable it by running this once in monero-wallet-cli: set enable-multisig-experimental 1"; \
+      er.message = "This wallet is multisig, and multisig is disabled. Multisig is an experimental feature and may have bugs. Things that could go wrong include: funds sent to a multisig wallet can't be spent at all, can only be spent with the participation of a malicious group member, or can be stolen by a malicious group member. You can enable it by running this once in saltedfish-wallet-cli: set enable-multisig-experimental 1"; \
       return false; \
     } \
   } while(0)
@@ -471,7 +471,7 @@ namespace tools
     tools::wallet2::BackgroundMiningSetupType setup = m_wallet->setup_background_mining();
     if (setup == tools::wallet2::BackgroundMiningNo)
     {
-      MLOG_RED(el::Level::Warning, "Background mining not enabled. Run \"set setup-background-mining 1\" in monero-wallet-cli to change.");
+      MLOG_RED(el::Level::Warning, "Background mining not enabled. Run \"set setup-background-mining 1\" in saltedfish-wallet-cli to change.");
       return;
     }
 
@@ -497,7 +497,7 @@ namespace tools
       MINFO("The daemon is not set up to background mine.");
       MINFO("With background mining enabled, the daemon will mine when idle and not on battery.");
       MINFO("Enabling this supports the network you are using, and makes you eligible for receiving new monero");
-      MINFO("Set setup-background-mining to 1 in monero-wallet-cli to change.");
+      MINFO("Set setup-background-mining to 1 in saltedfish-wallet-cli to change.");
       return;
     }
 
@@ -653,6 +653,7 @@ namespace tools
       res.wallet_type = "Normal";
     res.network_type = m_wallet->nettype() == cryptonote::TESTNET ? "Testnet"
                      : m_wallet->nettype() == cryptonote::STAGENET ? "Stagenet"
+                     : m_wallet->nettype() == cryptonote::SNACKNET ? "Snacknet"
                      : "Mainnet";
     res.daemon_address = m_wallet->get_daemon_address();
     res.daemon_proxy = m_wallet->get_proxy();
@@ -4885,6 +4886,7 @@ namespace tools
       { cryptonote::MAINNET, "mainnet" },
       { cryptonote::TESTNET, "testnet" },
       { cryptonote::STAGENET, "stagenet" },
+      { cryptonote::SNACKNET, "snacknet" },
     };
     if (!req.any_net_type && !m_wallet) return not_open(er);
     for (const auto &net_type: net_types)
@@ -5147,9 +5149,10 @@ public:
     {
       const bool testnet = tools::wallet2::has_testnet_option(vm);
       const bool stagenet = tools::wallet2::has_stagenet_option(vm);
-      if (testnet && stagenet)
+      const bool snacknet = tools::wallet2::has_snacknet_option(vm);
+      if (testnet + stagenet + snacknet > 1)
       {
-        MERROR(tools::wallet_rpc_server::tr("Can't specify more than one of --testnet and --stagenet"));
+        MERROR(tools::wallet_rpc_server::tr("Can't specify more than one of --testnet, --stagenet and --snacknet"));
         return false;
       }
 

@@ -195,6 +195,13 @@ namespace cryptonote
 
   bool checkpoints::init_default_checkpoints(network_type nettype)
   {
+    if (nettype == SNACKNET)
+    {
+      // snacknet is its own chain: it must not inherit any of the hardcoded
+      // mainnet/testnet/stagenet checkpoints, or syncing would fail with
+      // "checkpoints conflict" on the very first blocks
+      return true;
+    }
     if (nettype == TESTNET)
     {
       ADD_CHECKPOINT2(0,     "48ca7cd3c8de5b6a4d53d2861fbdaedca141553559f9be9520068053cda8430b", "0x1");
@@ -313,6 +320,11 @@ namespace cryptonote
 
   bool checkpoints::load_checkpoints_from_dns(network_type nettype)
   {
+    // snacknet has no MoneroPulse checkpoint infrastructure: never fall
+    // through to the mainnet DNS URLs
+    if (nettype == SNACKNET)
+      return true;
+
     std::vector<std::string> records;
 
     // All four MoneroPulse domains have DNSSEC on and valid

@@ -267,6 +267,8 @@ namespace cryptonote {
       return "testnet";
     case STAGENET:
       return "stagenet";
+    case SNACKNET:
+      return "snacknet";
     case FAKECHAIN:
       return "fakechain";
     default:

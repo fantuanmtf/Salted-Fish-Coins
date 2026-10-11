@@ -30,6 +30,7 @@
 #include "common/command_line.h"
 #include "net/parse.h"
 #include "daemon/command_parser_executor.h"
+#include "cryptonote_basic/cryptonote_basic_impl.h"
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 
@@ -376,52 +377,38 @@ bool t_command_parser_executor::start_mining(const std::vector<std::string>& arg
 
   cryptonote::address_parse_info info;
   cryptonote::network_type nettype = cryptonote::MAINNET;
-  if(!cryptonote::get_account_address_from_str(info, cryptonote::MAINNET, args.front()))
-  {
-    if(!cryptonote::get_account_address_from_str(info, cryptonote::TESTNET, args.front()))
+  auto parse_address_for_any_nettype = [&info, &nettype](const std::string &str) -> bool {
+    static const cryptonote::network_type nettypes[] = {
+      cryptonote::MAINNET, cryptonote::TESTNET, cryptonote::STAGENET, cryptonote::SNACKNET
+    };
+    for (cryptonote::network_type nt : nettypes)
     {
-      if(!cryptonote::get_account_address_from_str(info, cryptonote::STAGENET, args.front()))
+      if (cryptonote::get_account_address_from_str(info, nt, str))
       {
-        bool dnssec_valid;
-        std::string address_str = tools::dns_utils::get_account_address_as_str_from_url(args.front(), dnssec_valid,
-            [](const std::string &url, const std::vector<std::string> &addresses, bool dnssec_valid) -> std::string {
-              if (!dnssec_valid) return {};
-              if (addresses.empty()) return {};
-              return addresses[0];
-            });
-        if(!dnssec_valid)
-        {
-          std::cout << "Invalid syntax: Invalid DNSSEC for " << args.front() << std::endl;
-          return true;
-        }
-        if(!cryptonote::get_account_address_from_str(info, cryptonote::MAINNET, address_str))
-        {
-          if(!cryptonote::get_account_address_from_str(info, cryptonote::TESTNET, address_str))
-          {
-            if(!cryptonote::get_account_address_from_str(info, cryptonote::STAGENET, address_str))
-            {
-              std::cout << "Invalid syntax: Target account address has wrong format. For more details, use the help command." << std::endl;
-              return true;
-            }
-            else
-            {
-              nettype = cryptonote::STAGENET;
-            }
-          }
-          else
-          {
-            nettype = cryptonote::TESTNET;
-          }
-        }
-      }
-      else
-      {
-        nettype = cryptonote::STAGENET;
+        nettype = nt;
+        return true;
       }
     }
-    else
+    return false;
+  };
+  if(!parse_address_for_any_nettype(args.front()))
+  {
+    bool dnssec_valid;
+    std::string address_str = tools::dns_utils::get_account_address_as_str_from_url(args.front(), dnssec_valid,
+        [](const std::string &url, const std::vector<std::string> &addresses, bool dnssec_valid) -> std::string {
+          if (!dnssec_valid) return {};
+          if (addresses.empty()) return {};
+          return addresses[0];
+        });
+    if(!dnssec_valid)
     {
-      nettype = cryptonote::TESTNET;
+      std::cout << "Invalid syntax: Invalid DNSSEC for " << args.front() << std::endl;
+      return true;
+    }
+    if(!parse_address_for_any_nettype(address_str))
+    {
+      std::cout << "Invalid syntax: Target account address has wrong format. For more details, use the help command." << std::endl;
+      return true;
     }
   }
   if (info.is_subaddress)
@@ -430,7 +417,7 @@ bool t_command_parser_executor::start_mining(const std::vector<std::string>& arg
     return true;
   }
   if(nettype != cryptonote::MAINNET)
-    std::cout << "Mining to a " << (nettype == cryptonote::TESTNET ? "testnet" : "stagenet") << " address, make sure this is intentional!" << std::endl;
+    std::cout << "Mining to a " << cryptonote::get_network_type_name(nettype) << " address, make sure this is intentional!" << std::endl;
   uint64_t threads_count = 1;
   bool do_background_mining = false;  
   bool ignore_battery = false;  
@@ -1023,10 +1010,10 @@ bool t_command_parser_executor::prune_blockchain(const std::vector<std::string>&
 
   if (args.empty() || args[0] != "confirm")
   {
-    std::cout << "Warning: pruning from within monerod will not shrink the database file size." << std::endl;
+    std::cout << "Warning: pruning from within saltedfishd will not shrink the database file size." << std::endl;
     std::cout << "Instead, parts of the file will be marked as free, so the file will not grow" << std::endl;
     std::cout << "until that newly free space is used up. If you want a smaller file size now," << std::endl;
-    std::cout << "exit monerod and run monero-blockchain-prune (you will temporarily need more" << std::endl;
+    std::cout << "exit saltedfishd and run saltedfish-blockchain-prune (you will temporarily need more" << std::endl;
     std::cout << "disk space for the database conversion though). If you are OK with the database" << std::endl;
     std::cout << "file keeping the same size, re-run this command with the \"confirm\" parameter." << std::endl;
     return true;

@@ -81,6 +81,11 @@ namespace cryptonote
   , "Run on stagenet. The wallet must be launched with --stagenet flag."
   , false
   };
+  const command_line::arg_descriptor<bool, false> arg_snacknet_on = {
+  "snacknet"
+  , "Run on snacknet. The wallet must be launched with --snacknet flag."
+  , false
+  };
   const command_line::arg_descriptor<bool> arg_regtest_on  = {
     "regtest"
   , "Run in a regression testing mode."
@@ -96,18 +101,20 @@ namespace cryptonote
   , "Fixed difficulty used for testing."
   , 0
   };
-  const command_line::arg_descriptor<std::string, false, true, 3> arg_data_dir = {
+  const command_line::arg_descriptor<std::string, false, true, 4> arg_data_dir = {
     "data-dir"
   , "Specify data directory"
   , tools::get_default_data_dir()
-  , {{ &arg_testnet_on, &arg_stagenet_on, &arg_regtest_on }}
-  , [](std::array<bool, 3> nets, bool defaulted, std::string val)->std::string {
+  , {{ &arg_testnet_on, &arg_stagenet_on, &arg_regtest_on, &arg_snacknet_on }}
+  , [](std::array<bool, 4> nets, bool defaulted, std::string val)->std::string {
       if (nets[0])
         return (boost::filesystem::path(val) / "testnet").string();
       else if (nets[1])
         return (boost::filesystem::path(val) / "stagenet").string();
       else if (nets[2])
         return (boost::filesystem::path(val) / "fake").string();
+      else if (nets[3])
+        return (boost::filesystem::path(val) / "snacknet").string();
       return val;
     }
   };
@@ -199,7 +206,7 @@ namespace cryptonote
   static const command_line::arg_descriptor<std::string> arg_block_rate_notify = {
     "block-rate-notify"
   , "Run a program when the block rate undergoes large fluctuations. This might "
-    "be a sign of large amounts of hash rate going on and off the Monero network, "
+    "be a sign of large amounts of hash rate going on and off the Salted Fish Coins network, "
     "and thus be of potential interest in predicting attacks. %t will be replaced "
     "by the number of minutes for the observation window, %b by the number of "
     "blocks observed within that window, and %e by the number of blocks that was "
@@ -312,6 +319,7 @@ namespace cryptonote
 
     command_line::add_arg(desc, arg_testnet_on);
     command_line::add_arg(desc, arg_stagenet_on);
+    command_line::add_arg(desc, arg_snacknet_on);
     command_line::add_arg(desc, arg_regtest_on);
     command_line::add_arg(desc, arg_keep_fakechain);
     command_line::add_arg(desc, arg_fixed_difficulty);
@@ -343,10 +351,11 @@ namespace cryptonote
   {
     const bool testnet = command_line::get_arg(vm, arg_testnet_on);
     const bool stagenet = command_line::get_arg(vm, arg_stagenet_on);
+    const bool snacknet = command_line::get_arg(vm, arg_snacknet_on);
     const bool regtest = command_line::get_arg(vm, arg_regtest_on);
-    if (testnet + stagenet + regtest > 1)
+    if (testnet + stagenet + snacknet + regtest > 1)
       throw std::runtime_error("More than one network type argument was specified");
-    return testnet ? TESTNET : stagenet ? STAGENET : regtest ? FAKECHAIN : MAINNET;
+    return testnet ? TESTNET : stagenet ? STAGENET : snacknet ? SNACKNET : regtest ? FAKECHAIN : MAINNET;
   }
   //-----------------------------------------------------------------------------------------------
   bool core::handle_command_line(const boost::program_options::variables_map& vm)
@@ -1579,7 +1588,7 @@ namespace cryptonote
     {
       std::string main_message;
       if (m_offline)
-        main_message = "The daemon is running offline and will not attempt to sync to the Monero network.";
+        main_message = "The daemon is running offline and will not attempt to sync to the Salted Fish Coins network.";
       else
         main_message = "The daemon will start synchronizing with the network. This may take a long time to complete.";
       MGINFO_YELLOW(ENDL << "**********************************************************************" << ENDL
@@ -1822,7 +1831,7 @@ namespace cryptonote
       MDEBUG("blocks in the last " << seconds[n] / 60 << " minutes: " << b << " (probability " << p << ")");
       if (p < threshold)
       {
-        MWARNING("There were " << b << (b == max_blocks_checked ? " or more" : "") << " blocks in the last " << seconds[n] / 60 << " minutes, there might be large hash rate changes, or we might be partitioned, cut off from the Monero network or under attack, or your computer's time is off. Or it could be just sheer bad luck.");
+        MWARNING("There were " << b << (b == max_blocks_checked ? " or more" : "") << " blocks in the last " << seconds[n] / 60 << " minutes, there might be large hash rate changes, or we might be partitioned, cut off from the Salted Fish Coins network or under attack, or your computer's time is off. Or it could be just sheer bad luck.");
 
         std::shared_ptr<tools::Notify> block_rate_notify = m_block_rate_notify;
         if (block_rate_notify)
