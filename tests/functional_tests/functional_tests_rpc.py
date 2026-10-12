@@ -131,7 +131,9 @@ def kill():
     except: pass
 
 # wait for error/startup
-startup_timeout = 10
+# 5 daemons and 8 wallets must all bind their ports; give it more than the upstream
+# 10 seconds, as loaded CI runners need considerably longer to start them
+startup_timeout = 60
 deadline = time.monotonic() + startup_timeout
 for port in ports:
   addr = ('127.0.0.1', port)

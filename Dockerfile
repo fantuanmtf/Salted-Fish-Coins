@@ -24,10 +24,10 @@ RUN cmake --toolchain "contrib/depends/${TARGET}/share/toolchain.cmake" -S . -B 
 
 FROM scratch
 
-COPY --from=builder /monero/build/bin/monerod /
+COPY --from=builder /monero/build/bin/saltedfishd /
 
-EXPOSE 18080
-EXPOSE 18081
+EXPOSE 48080
+EXPOSE 48081
 
-ENTRYPOINT ["/monerod"]
-CMD ["--p2p-bind-ip=0.0.0.0", "--p2p-bind-port=18080", "--rpc-bind-ip=0.0.0.0", "--rpc-bind-port=18081", "--non-interactive", "--confirm-external-bind"]
+ENTRYPOINT ["/saltedfishd"]
+CMD ["--zakonet", "--p2p-bind-ip=0.0.0.0", "--p2p-bind-port=48080", "--rpc-bind-ip=0.0.0.0", "--rpc-bind-port=48081", "--non-interactive", "--confirm-external-bind"]
