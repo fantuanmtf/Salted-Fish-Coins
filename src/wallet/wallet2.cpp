@@ -15702,7 +15702,10 @@ uint64_t wallet2::get_segregation_fork_height() const
   if (m_nettype == STAGENET)
     return STAGENET_SEGREGATION_FORK_HEIGHT;
   if (m_nettype == ZAKONET)
-    return 0; // brand new chain, no pre-fork outputs to segregate
+    return 1000000000; // deliberately in the far future: zakonet has no pre-fork outputs,
+                       // and the segregation plumbing requires a height > RECENT_OUTPUT_BLOCKS
+                       // (a past-crossing value such as 0 made the wallet query [0..1] and every
+                       // transfer failed with "failed to get output distribution")
   THROW_WALLET_EXCEPTION_IF(m_nettype != MAINNET, tools::error::wallet_internal_error, "Invalid network type");
 
   if (m_segregation_height > 0)

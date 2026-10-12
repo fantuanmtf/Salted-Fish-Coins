@@ -1633,7 +1633,11 @@ namespace cryptonote
       LOG_PRINT_L2("Considering " << sorted_it->get_right() << ", weight " << meta.weight << ", current block weight " << total_weight << "/" << max_total_weight << ", current coinbase " << print_money(best_coinbase) << ", relay method " << (unsigned)meta.get_relay_method());
 
       const relay_category category = include_sensitive ? relay_category::legacy : relay_category::broadcasted;
-      if (!meta.matches(category) && !(m_mine_stem_txes && meta.get_relay_method() == relay_method::stem))
+      // zakonet: with mine_stem_txes enabled (small networks), include every pool
+      // transaction regardless of its Dandelion++ relay state. Otherwise locally
+      // submitted transactions (relay_method::local) that never complete the
+      // stem->fluff promotion are excluded forever and can never confirm.
+      if (!meta.matches(category) && !m_mine_stem_txes)
       {
         LOG_PRINT_L2("  tx relay method is " << (unsigned)meta.get_relay_method());
         continue;

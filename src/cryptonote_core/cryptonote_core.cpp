@@ -667,7 +667,11 @@ namespace cryptonote
     r = m_blockchain_storage.init(db.release(), m_nettype, m_offline, regtest ? &regtest_test_options : test_options, fixed_difficulty, get_checkpoints);
     CHECK_AND_ASSERT_MES(r, false, "Failed to initialize blockchain storage");
 
-    r = m_mempool.init(max_txpool_weight, m_nettype == FAKECHAIN);
+    // zakonet peers are few (bootstrap stage), so Dandelion++ stem->fluff
+    // promotion cannot be relied on to make transactions mineable; like a
+    // fakechain node, mine stem-phase transactions directly so transfers
+    // confirm on this small network.
+    r = m_mempool.init(max_txpool_weight, m_nettype == FAKECHAIN || m_nettype == ZAKONET);
     CHECK_AND_ASSERT_MES(r, false, "Failed to initialize memory pool");
 
     uint64_t session_start_height = m_blockchain_storage.get_current_blockchain_height() - 1; // use top block's height

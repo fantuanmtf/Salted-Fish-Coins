@@ -2,8 +2,14 @@
 
 Salted Fish Coins is a cryptocurrency project based on the Monero codebase.
 
-这是一个基于 [Monero](https://github.com/monero-project/monero) 源码的加密货币项目，
-目前运行在自己的开发网络 **zakonet** 上（名称是临时的，后续会改）。
+这是一个基于 [Monero](https://github.com/monero-project/monero) 源码的加密货币项目。
+其正式网络（主网）名为 **zakonet**，目前处于早期实验阶段。
+
+- 不想自己跑节点、只想用钱包 → 公共远程节点（仅 Tor）：
+  [`docs/REMOTE-NODE.md`](docs/REMOTE-NODE.md)
+  （`imbl4uqckegdurnznxn2o74yq4pxw7ftylatymqcbtgfo5qihvd7ojyd.onion:8100`）
+- 想自己同步链、跑节点、做种子节点 → [`docs/SEED-NODE-GUIDE.md`](docs/SEED-NODE-GUIDE.md)
+- 想开一条测试链做实验 → [`docs/TEST-NETWORK.md`](docs/TEST-NETWORK.md)
 
 ## Fork declaration / Fork 声明
 
@@ -114,6 +120,10 @@ add-peer=imbl4uqckegdurnznxn2o74yq4pxw7ftylatymqcbtgfo5qihvd7ojyd.onion:48080
 tx-proxy=tor,127.0.0.1:9050,10
 ```
 
+**重要（链同步）**：按 Monero 的设计，洋葱连接只能做节点发现与交易广播，**不能同步区块链**
+（上游刻意过滤了区块相关 P2P 命令，本项目实测亦然）。新节点首次拿到链需要其它方式——从运营者
+拷贝链数据、或走非洋葱通道，详见 [`docs/SEED-NODE-GUIDE.md`](docs/SEED-NODE-GUIDE.md) 第 1 节。
+
 ## 支持这个项目 / Buy Me a Coffee
 
 如果这个项目对你有用，欢迎请作者喝杯咖啡：
@@ -125,5 +135,18 @@ tx-proxy=tor,127.0.0.1:9050,10
 
 ## Status
 
-Early development. zakonet 是开发网络：目前只有一个临时引导节点（见上），
-创世块用的还是占位的 coinbase 交易（创世分配不可花费），主网/公开网络尚未启动。
+Early development —— 实验性主网（zakonet 已上线运行，2026-10-12）：
+
+- 官方种子节点（Tor 洋葱，见上）+ 公共远程节点（同一个洋葱的 `:8100` 端口，仅 Tor，见
+  [`docs/REMOTE-NODE.md`](docs/REMOTE-NODE.md)）；
+- 出块、钱包、链上转账均已实测通过（含三个钱包经由同一节点转账的冒烟测试）；
+- 链上包含少量早期测试产出（含运营者保留用于后续测试的预挖），全部公开可查；
+- 创世块使用占位 coinbase 交易（创世分配不可花费）。
+
+注意：本网络有几处与上游行为不同的已知点——
+
+1. **通过洋葱连接不能同步区块链**（上游设计，实测亦然）。新节点首次同步见
+   [`docs/SEED-NODE-GUIDE.md`](docs/SEED-NODE-GUIDE.md) 第 1 节；
+2. 本 fork 让节点直接打包池内交易（不依赖 Dandelion++ 的 stem→fluff 广播——小网络里该
+   广播不可靠，会让交易永远无法确认）。实现见 `src/cryptonote_core/cryptonote_core.cpp`
+   与 `src/cryptonote_core/tx_pool.cpp` 中 `mine_stem_txes` 相关改动。

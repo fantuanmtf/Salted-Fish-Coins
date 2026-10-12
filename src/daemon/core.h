@@ -91,10 +91,11 @@ public:
   {
     // A zakonet node has no seed nodes, so on a fresh network it never syncs
     // with a peer, and the "synchronized with a peer" event that normally
-    // triggers --start-mining never fires. Since --start-mining is an explicit
-    // opt-in by the operator, start the miner right away instead.
+    // triggers --start-mining never fires. Same for a regtest/fakechain node
+    // (single-machine chain, no peers by definition). Since --start-mining is
+    // an explicit opt-in by the operator, start the miner right away instead.
     // core::on_synchronized() is a no-op unless --start-mining was given.
-    if (m_core.get_nettype() == cryptonote::ZAKONET)
+    if (m_core.get_nettype() == cryptonote::ZAKONET || m_core.get_nettype() == cryptonote::FAKECHAIN)
       m_core.on_synchronized();
     return true;
   }
