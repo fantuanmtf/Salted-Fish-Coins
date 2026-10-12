@@ -153,3 +153,20 @@ TEST_neg(0__0);
 TEST_neg(0_0_);
 TEST_neg(_0_0);
 TEST_neg(0_0_0);
+
+// amounts formatted by print_money carry the ticker, and parse back
+TEST(parse_amount, handles_ticker_suffix)
+{
+  uint64_t val = 0;
+  ASSERT_TRUE(parse_amount(val, "1.5 SFC"));
+  ASSERT_EQ(UINT64_C(1500000000000), val);
+  ASSERT_TRUE(parse_amount(val, "42 SFC"));
+  ASSERT_EQ(UINT64_C(42000000000000), val);
+  ASSERT_TRUE(parse_amount(val, "0.000000000001 SFC"));
+  ASSERT_EQ(UINT64_C(1), val);
+
+  ASSERT_FALSE(parse_amount(val, "1.5SFC"));
+  ASSERT_FALSE(parse_amount(val, "1.5 SFCX"));
+  ASSERT_FALSE(parse_amount(val, "1.5 XMR"));
+  ASSERT_FALSE(parse_amount(val, "SFC"));
+}

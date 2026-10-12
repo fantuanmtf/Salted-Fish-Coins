@@ -49,7 +49,7 @@ TEST(uri, empty_string)
 
 TEST(uri, no_scheme)
 {
-  PARSE_URI("monero", false);
+  PARSE_URI("sfc", false);
 }
 
 TEST(uri, bad_scheme)
@@ -59,27 +59,27 @@ TEST(uri, bad_scheme)
 
 TEST(uri, scheme_not_first)
 {
-  PARSE_URI(" monero:", false);
+  PARSE_URI(" sfc:", false);
 }
 
 TEST(uri, no_body)
 {
-  PARSE_URI("monero:", false);
+  PARSE_URI("sfc:", false);
 }
 
 TEST(uri, no_address)
 {
-  PARSE_URI("monero:?", false);
+  PARSE_URI("sfc:?", false);
 }
 
 TEST(uri, bad_address)
 {
-  PARSE_URI("monero:44444", false);
+  PARSE_URI("sfc:44444", false);
 }
 
 TEST(uri, good_address)
 {
-  PARSE_URI("monero:" TEST_ADDRESS, true);
+  PARSE_URI("sfc:" TEST_ADDRESS, true);
   ASSERT_EQ(address, TEST_ADDRESS);
 }
 
@@ -94,7 +94,7 @@ TEST(uri, resets_outputs)
   std::vector<std::string> unknown_parameters{"old=parameter"};
   tools::wallet2 w(cryptonote::TESTNET);
 
-  ASSERT_TRUE(w.parse_uri("monero:" TEST_ADDRESS, address, payment_id, amount, description, recipient_name, unknown_parameters, error));
+  ASSERT_TRUE(w.parse_uri("sfc:" TEST_ADDRESS, address, payment_id, amount, description, recipient_name, unknown_parameters, error));
   EXPECT_EQ(address, TEST_ADDRESS);
   EXPECT_EQ(amount, 0);
   EXPECT_TRUE(payment_id.empty());
@@ -106,49 +106,49 @@ TEST(uri, resets_outputs)
 
 TEST(uri, good_integrated_address)
 {
-  PARSE_URI("monero:" TEST_INTEGRATED_ADDRESS, true);
+  PARSE_URI("sfc:" TEST_INTEGRATED_ADDRESS, true);
 }
 
 TEST(uri, parameter_without_inter)
 {
-  PARSE_URI("monero:" TEST_ADDRESS"&amount=1", false);
+  PARSE_URI("sfc:" TEST_ADDRESS"&amount=1", false);
 }
 
 TEST(uri, parameter_without_equals)
 {
-  PARSE_URI("monero:" TEST_ADDRESS"?amount", false);
+  PARSE_URI("sfc:" TEST_ADDRESS"?amount", false);
 }
 
 TEST(uri, parameter_without_value)
 {
-  PARSE_URI("monero:" TEST_ADDRESS"?tx_amount=", false);
+  PARSE_URI("sfc:" TEST_ADDRESS"?tx_amount=", false);
 }
 
 TEST(uri, negative_amount)
 {
-  PARSE_URI("monero:" TEST_ADDRESS"?tx_amount=-1", false);
+  PARSE_URI("sfc:" TEST_ADDRESS"?tx_amount=-1", false);
 }
 
 TEST(uri, bad_amount)
 {
-  PARSE_URI("monero:" TEST_ADDRESS"?tx_amount=alphanumeric", false);
+  PARSE_URI("sfc:" TEST_ADDRESS"?tx_amount=alphanumeric", false);
 }
 
 TEST(uri, duplicate_parameter)
 {
-  PARSE_URI("monero:" TEST_ADDRESS"?tx_amount=1&tx_amount=1", false);
+  PARSE_URI("sfc:" TEST_ADDRESS"?tx_amount=1&tx_amount=1", false);
 }
 
 TEST(uri, unknown_parameter)
 {
-  PARSE_URI("monero:" TEST_ADDRESS"?unknown=1", true);
+  PARSE_URI("sfc:" TEST_ADDRESS"?unknown=1", true);
   ASSERT_EQ(unknown_parameters.size(), 1);
   ASSERT_EQ(unknown_parameters[0], "unknown=1");
 }
 
 TEST(uri, unknown_parameters)
 {
-  PARSE_URI("monero:" TEST_ADDRESS"?tx_amount=1&unknown=1&tx_description=desc&foo=bar", true);
+  PARSE_URI("sfc:" TEST_ADDRESS"?tx_amount=1&unknown=1&tx_description=desc&foo=bar", true);
   ASSERT_EQ(unknown_parameters.size(), 2);
   ASSERT_EQ(unknown_parameters[0], "unknown=1");
   ASSERT_EQ(unknown_parameters[1], "foo=bar");
@@ -156,22 +156,22 @@ TEST(uri, unknown_parameters)
 
 TEST(uri, empty_payment_id)
 {
-  PARSE_URI("monero:" TEST_ADDRESS"?tx_payment_id=", false);
+  PARSE_URI("sfc:" TEST_ADDRESS"?tx_payment_id=", false);
 }
 
 TEST(uri, bad_payment_id)
 {
-  PARSE_URI("monero:" TEST_ADDRESS"?tx_payment_id=1234567890", false);
+  PARSE_URI("sfc:" TEST_ADDRESS"?tx_payment_id=1234567890", false);
 }
 
 TEST(uri, short_payment_id)
 {
-  PARSE_URI("monero:" TEST_ADDRESS"?tx_payment_id=1234567890123456", false);
+  PARSE_URI("sfc:" TEST_ADDRESS"?tx_payment_id=1234567890123456", false);
 }
 
 TEST(uri, long_payment_id)
 {
-  PARSE_URI("monero:" TEST_ADDRESS"?tx_payment_id=1234567890123456789012345678901234567890123456789012345678901234", true);
+  PARSE_URI("sfc:" TEST_ADDRESS"?tx_payment_id=1234567890123456789012345678901234567890123456789012345678901234", true);
   ASSERT_EQ(address, TEST_ADDRESS);
   ASSERT_EQ(payment_id, "1234567890123456789012345678901234567890123456789012345678901234");
 }
@@ -217,60 +217,60 @@ TEST(wallet2, parse_payment_id_pads_short_ids)
 
 TEST(uri, payment_id_with_integrated_address)
 {
-  PARSE_URI("monero:" TEST_INTEGRATED_ADDRESS"?tx_payment_id=1234567890123456", false);
+  PARSE_URI("sfc:" TEST_INTEGRATED_ADDRESS"?tx_payment_id=1234567890123456", false);
 }
 
 TEST(uri, empty_description)
 {
-  PARSE_URI("monero:" TEST_ADDRESS"?tx_description=", true);
+  PARSE_URI("sfc:" TEST_ADDRESS"?tx_description=", true);
   ASSERT_EQ(description, "");
 }
 
 TEST(uri, empty_recipient_name)
 {
-  PARSE_URI("monero:" TEST_ADDRESS"?recipient_name=", true);
+  PARSE_URI("sfc:" TEST_ADDRESS"?recipient_name=", true);
   ASSERT_EQ(recipient_name, "");
 }
 
 TEST(uri, non_empty_description)
 {
-  PARSE_URI("monero:" TEST_ADDRESS"?tx_description=foo", true);
+  PARSE_URI("sfc:" TEST_ADDRESS"?tx_description=foo", true);
   ASSERT_EQ(description, "foo");
 }
 
 TEST(uri, non_empty_recipient_name)
 {
-  PARSE_URI("monero:" TEST_ADDRESS"?recipient_name=foo", true);
+  PARSE_URI("sfc:" TEST_ADDRESS"?recipient_name=foo", true);
   ASSERT_EQ(recipient_name, "foo");
 }
 
 TEST(uri, url_encoding)
 {
-  PARSE_URI("monero:" TEST_ADDRESS"?tx_description=foo%20bar", true);
+  PARSE_URI("sfc:" TEST_ADDRESS"?tx_description=foo%20bar", true);
   ASSERT_EQ(description, "foo bar");
 }
 
 TEST(uri, non_alphanumeric_url_encoding)
 {
-  PARSE_URI("monero:" TEST_ADDRESS"?tx_description=foo%2x", true);
+  PARSE_URI("sfc:" TEST_ADDRESS"?tx_description=foo%2x", true);
   ASSERT_EQ(description, "foo%2x");
 }
 
 TEST(uri, truncated_url_encoding)
 {
-  PARSE_URI("monero:" TEST_ADDRESS"?tx_description=foo%2", true);
+  PARSE_URI("sfc:" TEST_ADDRESS"?tx_description=foo%2", true);
   ASSERT_EQ(description, "foo%2");
 }
 
 TEST(uri, percent_without_url_encoding)
 {
-  PARSE_URI("monero:" TEST_ADDRESS"?tx_description=foo%", true);
+  PARSE_URI("sfc:" TEST_ADDRESS"?tx_description=foo%", true);
   ASSERT_EQ(description, "foo%");
 }
 
 TEST(uri, url_encoded_once)
 {
-  PARSE_URI("monero:" TEST_ADDRESS"?tx_description=foo%2020", true);
+  PARSE_URI("sfc:" TEST_ADDRESS"?tx_description=foo%2020", true);
   ASSERT_EQ(description, "foo 20");
 }
 
@@ -281,7 +281,7 @@ TEST(uri, make_uri_encodes_equals)
   const std::string uri = w.make_uri(TEST_ADDRESS, "", 0, "key=value", "name=value", error);
 
   ASSERT_TRUE(error.empty());
-  ASSERT_EQ(uri, "monero:" TEST_ADDRESS"?recipient_name=name%3Dvalue&tx_description=key%3Dvalue");
+  ASSERT_EQ(uri, "sfc:" TEST_ADDRESS"?recipient_name=name%3Dvalue&tx_description=key%3Dvalue");
 
   std::string address, payment_id, recipient_name, description;
   uint64_t amount;

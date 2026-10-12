@@ -15386,8 +15386,9 @@ std::string wallet2::make_uri(const std::string &address, const std::string &pay
 
   if (amount > 0)
   {
-    // URI encoded amount is in decimal units, not atomic units
-    uri += (n_fields++ ? "&" : "?") + std::string("tx_amount=") + cryptonote::print_money(amount);
+    // URI encoded amount is in decimal units, not atomic units (and without a ticker,
+    // so that the amount field stays machine readable)
+    uri += (n_fields++ ? "&" : "?") + std::string("tx_amount=") + cryptonote::print_money(amount, cryptonote::get_default_decimal_point(), false);
   }
 
   if (!recipient_name.empty())

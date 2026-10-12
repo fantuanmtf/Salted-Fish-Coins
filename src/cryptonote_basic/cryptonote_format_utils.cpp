@@ -517,6 +517,13 @@ namespace cryptonote
     std::string str_amount = str_amount_;
     boost::algorithm::trim(str_amount);
 
+    // amounts formatted by print_money() carry the ticker (" SFC"); accept that form
+    // back, so "1.5" and "1.5 SFC" both parse
+    static const std::string ticker_suffix = " " CRYPTONOTE_TICKER;
+    if (str_amount.size() > ticker_suffix.size() &&
+        str_amount.compare(str_amount.size() - ticker_suffix.size(), ticker_suffix.size(), ticker_suffix) == 0)
+      str_amount.erase(str_amount.size() - ticker_suffix.size());
+
     size_t point_index = str_amount.find_first_of('.');
     size_t fraction_size;
     if (std::string::npos != point_index)
@@ -1297,20 +1304,20 @@ namespace cryptonote
       s.insert(s.size() - decimal_point, ".");
   }
   //---------------------------------------------------------------
-  std::string print_money(uint64_t amount, unsigned int decimal_point)
+  std::string print_money(uint64_t amount, unsigned int decimal_point, bool include_ticker)
   {
     std::string s = std::to_string(amount);
     insert_money_decimal_point(s, decimal_point);
-    return s + " " CRYPTONOTE_TICKER;
+    return include_ticker ? s + " " CRYPTONOTE_TICKER : s;
   }
   //---------------------------------------------------------------
-  std::string print_money(const boost::multiprecision::uint128_t &amount, unsigned int decimal_point)
+  std::string print_money(const boost::multiprecision::uint128_t &amount, unsigned int decimal_point, bool include_ticker)
   {
     std::stringstream ss;
     ss << amount;
     std::string s = ss.str();
     insert_money_decimal_point(s, decimal_point);
-    return s + " " CRYPTONOTE_TICKER;
+    return include_ticker ? s + " " CRYPTONOTE_TICKER : s;
   }
   //---------------------------------------------------------------
   uint64_t round_money_up(uint64_t amount, unsigned significant_digits)

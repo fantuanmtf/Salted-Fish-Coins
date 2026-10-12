@@ -180,8 +180,10 @@ namespace cryptonote
   void set_default_decimal_point(unsigned int decimal_point = CRYPTONOTE_DISPLAY_DECIMAL_POINT);
   unsigned int get_default_decimal_point();
   std::string get_unit(unsigned int decimal_point = -1);
-  std::string print_money(uint64_t amount, unsigned int decimal_point = -1);
-  std::string print_money(const boost::multiprecision::uint128_t &amount, unsigned int decimal_point = -1);
+  // include_ticker appends the currency ticker (" SFC"); pass false when the result is
+  // not for display but gets embedded in something machine readable (e.g. a payment URI)
+  std::string print_money(uint64_t amount, unsigned int decimal_point = -1, bool include_ticker = true);
+  std::string print_money(const boost::multiprecision::uint128_t &amount, unsigned int decimal_point = -1, bool include_ticker = true);
   uint64_t round_money_up(uint64_t amount, unsigned significant_digits);
   std::string round_money_up(const std::string &amount, unsigned significant_digits);
   //---------------------------------------------------------------
