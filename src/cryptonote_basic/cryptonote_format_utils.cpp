@@ -1278,15 +1278,15 @@ namespace cryptonote
     switch (decimal_point)
     {
       case 12:
-        return "monero";
+        return "SFC";
       case 9:
-        return "millinero";
+        return "milliSFC";
       case 6:
-        return "micronero";
+        return "microSFC";
       case 3:
-        return "nanonero";
+        return "nanoSFC";
       case 0:
-        return "piconero";
+        return "picoSFC";
       default:
         ASSERT_MES_AND_THROW("Invalid decimal point specification: " << decimal_point);
     }

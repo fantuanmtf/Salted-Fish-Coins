@@ -52,8 +52,9 @@
 
 #undef MONERO_DEFAULT_LOG_CATEGORY
 #define MONERO_DEFAULT_LOG_CATEGORY "wallet.simplewallet"
-// Hardcode Monero's donation address (see #1447)
-constexpr const char MONERO_DONATION_ADDR[] = "888tNkZrPN6JsEgekjMnABU4TBzc2Dt29EPAvkRxbANsAnjyPbb3iQ1YBRk1UXcdRsiKc9dhwMVgN5S9cQUiyoogDavup3H";
+// The Salted Fish Coins project's donation address (same one as in the README).
+// It is a mainnet XMR address, which is why `donate` is mainnet only.
+constexpr const char PROJECT_DONATION_ADDR[] = "4B6wjJUUVwyARsbMd174PN6ttc4LkBC2qarKDA881R1F3pEUMxcWx8Ta1FzAGvcoGPhE";
 
 /*!
  * \namespace cryptonote

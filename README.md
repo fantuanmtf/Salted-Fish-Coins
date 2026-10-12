@@ -147,6 +147,11 @@ Early development —— 实验性主网（zakonet 已上线运行，2026-10-12�
 
 1. **通过洋葱连接不能同步区块链**（上游设计，实测亦然）。新节点首次同步见
    [`docs/SEED-NODE-GUIDE.md`](docs/SEED-NODE-GUIDE.md) 第 1 节；
-2. 本 fork 让节点直接打包池内交易（不依赖 Dandelion++ 的 stem→fluff 广播——小网络里该
-   广播不可靠，会让交易永远无法确认）。实现见 `src/cryptonote_core/cryptonote_core.cpp`
-   与 `src/cryptonote_core/tx_pool.cpp` 中 `mine_stem_txes` 相关改动。
+2. **Dandelion++ 协议本身未改动**（stem 路径选择、embargo 定时器、fluff 概率都保持上游
+   实现），改的只是**打包策略**：zakonet 节点把池内所有交易都纳入出块模板，不再只收
+   "已 fluff" 的交易（`mine_stem_txes`）。原因：小网络里钱包提交的交易一直停留在
+   `relay_method::local`，等不到 stem→fluff 广播，按上游规则会永远不入块、转账无法确认。
+   **隐私影响**：这意味着矿工可能把刚在 stem 阶段看到的交易直接打包，理论上会暴露它在
+   传播路径上；目前网络几乎只有运营者自己的节点、没有匿名集，影响可忽略，但网络变大后
+   建议改回（或只打包进池超过 embargo 时间的那部分）。实现见
+   `src/cryptonote_core/cryptonote_core.cpp` 与 `src/cryptonote_core/tx_pool.cpp`。
