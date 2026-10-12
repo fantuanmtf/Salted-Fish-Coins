@@ -4,21 +4,32 @@
 
 ## A. regtest（单机即时链，最快）
 
-saltedfishd 支持 Monero 的 regtest（fakechain）模式：单机运行、无需对等节点、随挖随出块。
+saltedfishd 支持 Monero 的 regtest（fakechain）模式：单机运行、无需对等节点、随叫随出块。
 
-    saltedfishd --regtest --fixed-difficulty 1 \
-      --start-mining <一个主网格式的地址，'4' 开头> \
+    saltedfishd --regtest --offline --fixed-difficulty 1 \
       --data-dir /tmp/sfc-regtest --non-interactive --hide-my-port
+
+（`--offline` 是单机 regtest 的关键：`generateblocks` 要求节点自报"已同步"，而开着网络却
+没有对等节点的节点永远到不了那个状态；`--offline` 直接标记就绪。）
+
+出块用 regtest 专属的 `generateblocks` RPC（`--start-mining` 在 fakechain 上不触发，
+见下）：
+
+    curl -s http://127.0.0.1:18081/json_rpc -d \
+      '{"jsonrpc":"2.0","id":"0","method":"generateblocks",
+        "params":{"amount_of_blocks":1,"wallet_address":"<4 开头的主网格式地址>","starting_nonce":0}}'
+
+也可以直接 `saltedfishd` 交互命令行里执行 `generateblocks 1 <地址>`。
 
 要点：
 
 - regtest 只接受**主网 / 硬网格式的地址**（前缀 18/19/42）。zakonet 的地址（前缀 99）会被
   `Wrong address prefix` 拒绝——随便生成一个普通钱包地址即可，链上币没有意义。
 - `--fixed-difficulty 1` 让任意哈希都能出块；去掉则走正常难度调整。
-- **已知限制（本分支实测）**：regtest 节点可以正常启动、查链、跑钱包，但 `--start-mining`
-  与 RPC 挖矿在 fakechain 上不会触发（上游遗留；`core::on_synchronized()` 在 fakechain
-  上没有到达挖矿启动路径），所以目前 regtest 适合协议 / 钱包联调，不适合出块测试。
-  想测试出块请用一条自定义测试网（见下文 B）。
+- **已知限制（本分支实测）**：`--start-mining` 与 `start_mining` RPC 在 fakechain 上不会
+  真正开始挖矿（上游遗留；`core::on_synchronized()` 在 fakechain 上没有走到挖矿启动路径）。
+  regtest 上请改用 `generateblocks`（本项目的功能测试正是这么跑的，出块正常）。
+  想长时间持续挖矿、或要一条别人也能连的链，用下面的自定义测试网（见 B）。
 
 ## B. 独立测试网（自定义创世块，可对外）
 
